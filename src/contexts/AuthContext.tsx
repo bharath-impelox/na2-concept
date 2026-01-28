@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../common/constants/client-storage-keys';
 import { useLoginMutation } from '../common/api/auth.api';
 import { setSessionExpiry } from '../common/api/base.api';

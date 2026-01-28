@@ -133,7 +133,10 @@ const ChatWithAttachments: React.FC<ChatWithAttachmentsProps> = ({
 
   useEffect(() => {
     if (scrollMessageElement.current) {
-      scrollMessageElement.current.scrollTop = scrollMessageElement.current.scrollHeight;
+      scrollMessageElement.current.scrollTo({
+        top: scrollMessageElement.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
   }, [chatMessages, isTyping]);
 
@@ -142,7 +145,7 @@ const ChatWithAttachments: React.FC<ChatWithAttachmentsProps> = ({
 
   useEffect(() => {
     let index = 0;
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (isTyping) {
       setTypingStatus(typingStatus[0]!);
@@ -180,20 +183,30 @@ const ChatWithAttachments: React.FC<ChatWithAttachmentsProps> = ({
       </div>
 
       {/* Messages */}
-      <div ref={scrollMessageElement} className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-4 min-h-0">
+      <div ref={scrollMessageElement} className={`flex-1 overflow-y-auto overflow-x-hidden p-10 space-y-4 min-h-0 ${agentType === 'voice' ? 'flex items-center justify-center' : ''}`}>
         {chatMessages.length === 0 && agentType !== 'voice' && (
           <div className="text-center mt-25 text-gray-500">
             <p className="text-sm">Create Testing Environment to see the conversation...</p>
           </div>
         )}
         {agentType == 'voice'  && (
-          <div>
-            <div className="relative mx-auto mt-10 flex items-center justify-center w-40 h-40">
-              <div className={`absolute w-40 h-40 rounded-full ${connected ? 'animate-ping' : ''}`} style={{ background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)', opacity: 0.3 }}></div>
-              <div className="absolute w-32 h-32 rounded-full animate-pulse" style={{ background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)', opacity: 0.5 }}></div>
-              <div className="relative w-24 h-24 rounded-full flex text-xs text-white text-center justify-center items-center" style={{ background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' }}>
-                {connected ? 'Connected' : 'Not Connect'}
-              </div>
+          <div className="relative flex items-center justify-center w-full" style={{ minHeight: '200px', padding: '30px 0', contain: 'layout style paint' }}>
+            <div className={`absolute w-28 h-28 rounded-full ${connected ? 'animate-ping' : ''}`} style={{ 
+              background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)', 
+              opacity: 0.3, 
+              willChange: 'transform, opacity',
+              transform: 'translateZ(0)',
+              pointerEvents: 'none'
+            }}></div>
+            <div className="absolute w-24 h-24 rounded-full animate-pulse" style={{ 
+              background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)', 
+              opacity: 0.5, 
+              willChange: 'opacity',
+              transform: 'translateZ(0)',
+              pointerEvents: 'none'
+            }}></div>
+            <div className="relative w-20 h-20 rounded-full flex text-xs text-white text-center justify-center items-center z-10" style={{ background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' }}>
+              {connected ? 'Connected' : 'Not Connect'}
             </div>
           </div>
         )}
@@ -211,7 +224,7 @@ const ChatWithAttachments: React.FC<ChatWithAttachmentsProps> = ({
                       ? "text-white"
                       : "bg-gray-100 text-gray-900"
                   }`}
-                  style={message.sender === "user" ? { background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}
+                  style={message.sender === "user" ? { background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}
                 >
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                 </div>
@@ -226,7 +239,7 @@ const ChatWithAttachments: React.FC<ChatWithAttachmentsProps> = ({
                       className={`rounded-lg overflow-hidden ${
                         message.sender === "user" ? "" : "bg-gray-100"
                       }`}
-                      style={message.sender === "user" ? { background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}
+                      style={message.sender === "user" ? { background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}
                     >
                       {attachment.preview ? (
                         <img

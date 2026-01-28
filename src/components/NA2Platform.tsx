@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Pie, Doughnut, Bar } from 'react-chartjs-2';
+import { Doughnut, Bar } from 'react-chartjs-2';
 import { operationsData, OperationRecord } from '../data/operationsData';
 import { industryData } from '../data/industryData';
 import { translations, Language } from '../i18n/translations';
@@ -44,8 +44,6 @@ import {
   RotateCcw, 
   AlertTriangle, 
   Search,
-  Sparkles,
-  Send,
   ArrowRight,
   DollarSign,
   Coins,
@@ -79,9 +77,10 @@ interface NA2PlatformProps {
   defaultView?: 'dashboard' | 'operations' | 'studio';
 }
 
-const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
+const NA2Platform = ({ defaultView: _defaultView = 'dashboard' }: NA2PlatformProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout: _logout } = useAuth();
   const { logout } = useAuth();
   
   // Determine active view from current route
@@ -117,8 +116,8 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
 
   // Color system - Based on brand palette with slight industry variations
   // Main brand color: #1b44fe (Primary)
-  // Primary gradient: radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)
-  const primaryGradient = 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)';
+  // Primary gradient: radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)
+  const primaryGradient = 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)';
   const colors = {
     clinic: { 
       primary: '#1b44fe',      // Main brand blue
@@ -292,13 +291,13 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
 
   // ============ REUSABLE COMPONENTS ============
 
-  const Card = ({ children, className = '', onClick, hover = false }) => (
-    <div className={`bg-white rounded-3xl border border-[#E5E5EA] shadow-sm ${hover ? 'cursor-pointer transition-all duration-300 hover:border-[#D1D1D6] hover:shadow-lg hover:-translate-y-0.5' : ''} ${className}`} onClick={onClick}>
+  const Card = ({ children, className = '', onClick, hover = false, style }: { children: React.ReactNode; className?: string; onClick?: (e?: React.MouseEvent) => void; hover?: boolean; style?: React.CSSProperties }) => (
+    <div className={`bg-white rounded-3xl border border-[#E5E5EA] shadow-sm ${hover ? 'cursor-pointer transition-all duration-300 hover:border-[#D1D1D6] hover:shadow-lg hover:-translate-y-0.5' : ''} ${className}`} onClick={onClick} style={style}>
       {children}
     </div>
   );
 
-  const SectionHeader = ({ title, subtitle, action }) => (
+  const SectionHeader = ({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) => (
     <div className="flex items-center justify-between mb-8">
       <div>
         <h2 className="text-2xl font-bold text-[#2A2A2A] tracking-tight">{title}</h2>
@@ -308,15 +307,15 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
     </div>
   );
 
-  const Stat = ({ value, label, color, size = 'md' }) => (
+  const Stat = ({ value, label, color, size = 'md' }: { value: string | number; label: string; color?: string; size?: 'sm' | 'md' | 'lg' }) => (
     <div className="text-center">
       <div className={`font-bold ${size === 'lg' ? 'text-4xl' : size === 'sm' ? 'text-lg' : 'text-2xl'}`} style={{ color: color || theme.primary }}>{value}</div>
       <div className={`text-[#7C7C7C] ${size === 'lg' ? 'text-sm mt-1' : 'text-xs mt-0.5'}`}>{label}</div>
     </div>
   );
 
-  const Badge = ({ children, type = 'default' }) => {
-    const styles = {
+  const Badge = ({ children, type = 'default' }: { children: React.ReactNode; type?: 'success' | 'warning' | 'danger' | 'info' | 'default' }) => {
+    const styles: Record<'success' | 'warning' | 'danger' | 'info' | 'default', string> = {
       success: 'bg-[#E9FAEF] text-[#2F7F4D] border-[#9FDFB7]',
       warning: 'bg-[#FEF4E5] text-[#C8641B] border-[#FAC38D]',
       danger: 'bg-[#FDECEE] text-[#D9363E] border-[#F4BFC3]',
@@ -358,14 +357,14 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
     }
   };
 
-  const ListRow = ({ icon, title, subtitle, right, onClick, last = false }) => {
+  const ListRow = ({ icon, title, subtitle, right, onClick, last = false }: { icon?: string | React.ComponentType<any>; title: string | React.ReactNode; subtitle?: string; right?: React.ReactNode; onClick?: () => void; last?: boolean }) => {
     const IconComponent = typeof icon === 'string' ? getChannelIcon(icon) : icon;
     return (
       <div className={`flex items-center gap-4 p-5 ${!last ? 'border-b border-[#F2F2F7]' : ''} ${onClick ? 'cursor-pointer hover:bg-[#FBFBFB] transition-colors' : ''}`} onClick={onClick}>
         {icon && (
           <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm" style={{ background: theme.light }}>
             {typeof icon === 'string' ? (
-              <IconComponent className="w-5 h-5" style={{ color: theme.primary }} />
+              React.createElement(IconComponent, { className: "w-5 h-5", style: { color: theme.primary } })
             ) : (
               React.createElement(icon, { className: "w-5 h-5", style: { color: theme.primary } })
             )}
@@ -381,10 +380,10 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
     );
   };
 
-  const Button = ({ children, variant = 'primary', size = 'md', onClick, className = '', disabled = false }) => {
+  const Button = ({ children, variant = 'primary', size = 'md', onClick, className = '', disabled = false }: { children: React.ReactNode; variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md' | 'lg'; onClick?: () => void; className?: string; disabled?: boolean }) => {
     const base = 'font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2';
-    const sizes = { sm: 'px-3 py-1.5 text-sm', md: 'px-5 py-2.5 text-sm', lg: 'px-6 py-3' };
-    const variants = {
+    const sizes: Record<'sm' | 'md' | 'lg', string> = { sm: 'px-3 py-1.5 text-sm', md: 'px-5 py-2.5 text-sm', lg: 'px-6 py-3' };
+    const variants: Record<'primary' | 'secondary' | 'ghost' | 'danger', string> = {
       primary: 'text-white shadow-md hover:shadow-lg',
       secondary: 'border border-[#D1D1D6] text-[#383838] hover:bg-[#FBFBFB]',
       ghost: 'text-[#5E5E5E] hover:bg-[#F5F5F5]',
@@ -468,14 +467,14 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
       return colorMap[channelId.toLowerCase()] || '#7C7C7C';
     };
 
-    const channelData = channels.map(ch => ({
+    const channelData = channels.map((ch: any) => ({
       id: ch.id || ch.name.toLowerCase().replace(/\s+/g, ''),
       name: ch.name,
       sent: ch.sent,
       converted: ch.converted,
       conversionRate: ch.sent > 0 ? (ch.converted / ch.sent) * 100 : 0
     }));
-    const maxSent = Math.max(...channelData.map(d => d.sent), 1);
+    const maxSent = Math.max(...channelData.map((d: any) => d.sent), 1);
 
     return (
       <div className="p-6 flex flex-col h-full">
@@ -484,7 +483,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           <p className="text-xs text-[#7C7C7C]">{t.dashboard.messagesSentVsConverted}</p>
         </div>
         <div className="space-y-4 flex-1">
-          {channelData.map((ch, idx) => {
+          {channelData.map((ch: any, idx: number) => {
             const IconComponent = getChannelIcon(ch.id);
             const iconColor = getChannelColor(ch.id);
             
@@ -533,10 +532,9 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
 
   // Risk Breakdown Chart (Donut chart)
   const RiskBreakdownChart = () => {
-    const total = capacity.total;
     const sections = capacity.sections;
-    const totalAtRisk = sections.reduce((sum, s) => sum + (s.type === 'warning' || s.type === 'danger' ? s.count : 0), 0);
-    const safe = sections.find(s => s.type === 'success')?.count || 0;
+    const totalAtRisk = sections.reduce((sum: number, s: any) => sum + (s.type === 'warning' || s.type === 'danger' ? s.count : 0), 0);
+    const safe = sections.find((s: any) => s.type === 'success')?.count || 0;
     const risk = totalAtRisk;
 
     const chartData = {
@@ -568,7 +566,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
             padding: 15,
             font: {
               size: 12,
-              weight: '600' as const,
+              weight: '600' as any,
             },
             color: '#383838',
             usePointStyle: true,
@@ -605,7 +603,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           <p className="text-xs text-[#7C7C7C]">{t.dashboard.safe} vs {t.dashboard.atRisk.toLowerCase()} {data.capacityUnit.toLowerCase()}</p>
         </div>
         <div className="h-64 flex-1">
-          <Doughnut data={chartData} options={options} />
+          <Doughnut data={chartData} options={options as any} />
         </div>
       </div>
     );
@@ -664,7 +662,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
 
   // Booked VS Unbooked Slots Chart (Healthcare only)
   const BookedVSUnbookedSlotsChart = () => {
-    const booked = capacity.filled || 0;
+    const booked = (capacity as any).filled || 0;
     const unbooked = capacity.total - booked;
 
     const chartData = {
@@ -697,7 +695,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
             padding: 15,
             font: {
               size: 12,
-              weight: '600' as const,
+              weight: '600' as any,
             },
             color: '#383838',
             usePointStyle: true,
@@ -742,11 +740,9 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           ticks: {
             font: {
               size: 11,
+              weight: 600,
             },
             color: '#383838',
-            font: {
-              weight: '600' as const,
-            },
           },
           grid: {
             display: false,
@@ -762,7 +758,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           <p className="text-xs text-[#7C7C7C]">Current slot utilization breakdown</p>
         </div>
         <div className="h-64 flex-1">
-          <Bar data={chartData} options={options} />
+          <Bar data={chartData} options={options as any} />
         </div>
       </div>
     );
@@ -771,8 +767,8 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
   // Patient Visits Vs No Show Chart (Healthcare only)
   const PatientVisitsVsNoShowChart = () => {
     const sections = capacity.sections;
-    const visits = sections.find(s => s.type === 'success')?.count || 0;
-    const noShows = sections.find(s => s.type === 'danger')?.count || 0;
+    const visits = sections.find((s: any) => s.type === 'success')?.count || 0;
+    const noShows = sections.find((s: any) => s.type === 'danger')?.count || 0;
     const total = visits + noShows;
     const visitsPercent = total > 0 ? (visits / total) * 100 : 0;
     const noShowsPercent = total > 0 ? (noShows / total) * 100 : 0;
@@ -1059,11 +1055,6 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
   };
 
   const Layer1Outcomes = () => {
-    const allOutcomes = {
-      today: data.outcomes.today,
-      week: data.outcomes.week,
-      month: data.outcomes.month
-    };
 
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
@@ -1086,7 +1077,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
         y: 0,
         transition: {
           duration: 0.5,
-          ease: "easeOut"
+          ease: "easeOut" as const
         }
       }
     };
@@ -1098,7 +1089,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
         scale: 1,
         transition: {
           duration: 0.5,
-          ease: "easeOut"
+          ease: "easeOut" as const
         }
       },
       hover: {
@@ -1126,7 +1117,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
             {[{ id: 'today', label: t.common.today }, { id: 'week', label: t.common.week }, { id: 'month', label: t.common.month }].map(period => (
               <motion.button
                 key={period.id}
-                onClick={() => setTimePeriod(period.id)}
+                onClick={() => setTimePeriod(period.id as 'today' | 'week' | 'month')}
                 className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   timePeriod === period.id
                     ? 'bg-white text-[#383838] shadow-md'
@@ -1250,7 +1241,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
               {/* Row 1: Total Appointments, Unique Patients, No Show Rate, Upcoming Appointments */}
               {[
                 { icon: Calendar, value: capacity.total, label: 'Total Appointments', color: '#1b44fe' },
-                { icon: UserPlus, value: capacity.total - 5, label: 'Unique Patients', color: '#8B5CF6' },
+                { icon: UserPlus, value: capacity.total - 5, label: 'Total Patients', color: '#8B5CF6' },
                 { icon: TrendingDown, value: '12%', label: 'No Show Rate', color: '#EF4444' },
               ].map((item, i) => {
                 const IconComponent = item.icon;
@@ -1312,23 +1303,23 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
                 );
               })}
               <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-lg backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/60 overflow-hidden">
+                <Card onClick={() => {}} className="border-0 shadow-lg backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/60 overflow-hidden">
                   <MiniEventCalendar />
                 </Card>
               </motion.div>
               {/* Row 2: Charts below Total Appointments */}
               <motion.div variants={itemVariants} className="h-full">
-                <Card className="border-0 shadow-md h-full flex flex-col">
+                <Card onClick={() => {}} className="border-0 shadow-md h-full flex flex-col">
                   <RiskBreakdownChart />
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="h-full">
-                <Card className="border-0 shadow-md h-full flex flex-col">
+                <Card onClick={() => {}} className="border-0 shadow-md h-full flex flex-col">
                   <BookedVSUnbookedSlotsChart />
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="col-span-2 h-full">
-                <Card className="border-0 shadow-md h-full flex flex-col">
+                <Card onClick={() => {}} className="border-0 shadow-md h-full flex flex-col">
                   <PatientVisitsVsNoShowChart />
                 </Card>
               </motion.div>
@@ -1474,17 +1465,17 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           {selectedIndustry === 'clinic' ? (
             <>
               <motion.div variants={itemVariants} className="h-full">
-                <Card className="border-0 shadow-md h-full flex flex-col">
+                <Card onClick={() => {}} className="border-0 shadow-md h-full flex flex-col">
                   <RevenueTrendChart />
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="h-full">
-                <Card className="border-0 shadow-md h-full flex flex-col">
+                <Card onClick={() => {}} className="border-0 shadow-md h-full flex flex-col">
                   <UtilizationTrendChart />
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants} className="h-full">
-                <Card className="border-0 shadow-md h-full flex flex-col">
+                <Card onClick={() => {}} className="border-0 shadow-md h-full flex flex-col">
                   <ChannelPerformanceChart />
                 </Card>
               </motion.div>
@@ -1492,22 +1483,22 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           ) : (
             <>
               <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-md">
+                <Card onClick={() => {}} className="border-0 shadow-md">
                   <UtilizationTrendChart />
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-md">
+                <Card onClick={() => {}} className="border-0 shadow-md">
                   <ChannelPerformanceChart />
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-md">
+                <Card onClick={() => {}} className="border-0 shadow-md">
                   <RiskBreakdownChart />
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-md">
+                <Card onClick={() => {}} className="border-0 shadow-md">
                   <RevenueTrendChart />
                 </Card>
               </motion.div>
@@ -1522,10 +1513,11 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
     <div className="space-y-8">
       <SectionHeader 
         title={`${t.dashboard.howDidAchieve} ${outcomes.rate}% ${data.capacityUnit} ${t.dashboard.utilization.toLowerCase()}?`} 
-        subtitle={`${t.dashboard.completeBreakdown} ${data.capacityUnit.toLowerCase()} ${t.dashboard.breakdownFor} ${timeLabel}`} 
+        subtitle={`${t.dashboard.completeBreakdown} ${data.capacityUnit.toLowerCase()} ${t.dashboard.breakdownFor} ${timeLabel}`}
+        action={undefined}
       />
       
-      <Card className="p-8 border-0 shadow-lg">
+      <Card onClick={() => {}} className="p-8 border-0 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-md" style={{ background: theme.light }}>
@@ -1538,15 +1530,15 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           </div>
           <div className="text-right">
             <div className="text-4xl font-extrabold mb-2 tracking-tight" style={{ color: theme.primary }}>
-              {capacity.filled} / {capacity.total}
+              {(capacity as any).filled || 0} / {capacity.total}
             </div>
-            <div className="text-sm font-semibold text-[#7C7C7C] uppercase tracking-wide">{t.industries[selectedIndustry].filled}</div>
+            <div className="text-sm font-semibold text-[#7C7C7C] uppercase tracking-wide">{(t.industries[selectedIndustry] as any).filled || 'Filled'}</div>
           </div>
         </div>
       </Card>
 
-      <Card className="border-0 shadow-md overflow-hidden">
-        {capacity.sections.map((section, idx) => (
+      <Card onClick={() => {}} className="border-0 shadow-md overflow-hidden">
+        {capacity.sections.map((section: any, idx: number) => (
           <div key={idx} className={`p-6 ${idx < capacity.sections.length - 1 ? 'border-b border-[#F2F2F7]' : ''} hover:bg-[#FBFBFB] transition-colors`}>
             <div className="flex items-center gap-5">
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${
@@ -1575,7 +1567,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
                 </div>
                 {section.resolutions.length > 0 && (
                   <div className="mt-4 space-y-2.5 ml-0">
-                    {section.resolutions.map((res, ridx) => (
+                    {section.resolutions.map((res: any, ridx: number) => (
                       <div key={ridx} className="flex items-center gap-3 py-2.5 px-4 rounded-xl bg-[#FBFBFB] border border-[#F2F2F7]">
                         <div className={`w-2.5 h-2.5 rounded-full ${res.type === 'success' ? 'bg-[#2F7F4D]' : res.type === 'warning' ? 'bg-[#C8641B]' : 'bg-[#D9363E]'}`} />
                         <div className="flex-1 text-sm font-medium text-[#383838]">{res.label}</div>
@@ -1612,7 +1604,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
   );
 
   // Helper to open customer in Operations
-  const openInOperations = (customerName) => {
+  const openInOperations = (customerName: string) => {
     navigate('/operations');
     setSearchQuery(customerName);
     setStatusFilter('all');
@@ -1628,7 +1620,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
       <SectionHeader title={t.operations.executionDetails} subtitle={`${t.operations.forTrustAudits} • ${periodLabel}`} action={
         <div className="flex gap-1 p-1 bg-[#F5F5F5] rounded-xl border border-[#E5E5EA]">
           {['channel', 'customer'].map(mode => (
-            <button key={mode} onClick={() => setViewMode(mode)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${viewMode === mode ? 'bg-white shadow-sm text-[#2A2A2A]' : 'text-[#7C7C7C]'}`}>
+            <button key={mode} onClick={() => setViewMode(mode as 'channel' | 'customer')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${viewMode === mode ? 'bg-white shadow-sm text-[#2A2A2A]' : 'text-[#7C7C7C]'}`}>
               {mode === 'channel' ? t.operations.byChannel : `${t.operations.byCustomer} ${data.entityName}`}
             </button>
           ))}
@@ -1653,7 +1645,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
 
       <Card>
         {viewMode === 'channel' ? (
-          channels.map((ch, idx) => (
+          channels.map((ch: any, idx: number) => (
             <ListRow key={ch.id} icon={ch.icon} title={ch.name} subtitle={`${ch.converted} ${t.operations.conversions}`} last={idx === channels.length - 1}
               onClick={() => { setSelectedChannel(ch); setSelectedCustomer(null); setDrillDownLevel(4); }}
               right={<div className="flex items-center gap-6 text-sm mr-4"><Stat value={ch.sent} label={t.operations.sent} size="sm" color="#7C7C7C" /><span className="text-[#BEBEC2]">→</span><Stat value={ch.read} label={t.operations.read} size="sm" color="#7C7C7C" /><span className="text-[#BEBEC2]">→</span><Stat value={ch.converted} label={t.operations.done} size="sm" color="#2F7F4D" /></div>}
@@ -1664,13 +1656,12 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           opsData.records.slice(0, 6).map((record, idx) => (
             <ListRow 
               key={record.id} 
-              icon={
-                <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: theme.light, color: theme.primary }}>
-                  {record.name.split(' ').map(n => n[0]).join('')}
-                </div>
-              }
+              icon={undefined}
               title={
                 <div className="flex items-center gap-2">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: theme.light, color: theme.primary }}>
+                    {record.name.split(' ').map((n: string) => n[0]).join('')}
+                  </div>
                   <span>{record.name}</span>
                   {record.vip && <Star className="w-3 h-3 text-[#F18A3F]" />}
                 </div>
@@ -1699,10 +1690,10 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
           ))
         )}
       </Card>
-      <Card className="p-5" style={{ background: theme.light }}>
+      <Card onClick={() => {}} className="p-5" style={{ background: theme.light } as any}>
         <div className="flex items-center justify-between">
-          <div><div className="font-medium" style={{ color: theme.dark }}>{t.operations.totalActions} • {periodLabel}</div><div className="text-2xl font-bold" style={{ color: theme.primary }}>{channels.reduce((s, c) => s + c.sent, 0)} {t.operations.messages} • {channels.length} {t.operations.channels}</div></div>
-          <div className="text-right"><div className="text-sm font-semibold" style={{ color: theme.dark }}>{t.dashboard.overallConversion}</div><div className="text-2xl font-bold text-[#2F7F4D]">{Math.round((channels.reduce((s, c) => s + c.converted, 0) / channels.reduce((s, c) => s + c.sent, 0)) * 100)}%</div></div>
+          <div><div className="font-medium" style={{ color: theme.dark }}>{t.operations.totalActions} • {periodLabel}</div><div className="text-2xl font-bold" style={{ color: theme.primary }}>{channels.reduce((s: number, c: any) => s + c.sent, 0)} {t.operations.messages} • {channels.length} {t.operations.channels}</div></div>
+          <div className="text-right"><div className="text-sm font-semibold" style={{ color: theme.dark }}>{t.dashboard.overallConversion}</div><div className="text-2xl font-bold text-[#2F7F4D]">{Math.round((channels.reduce((s: number, c: any) => s + c.converted, 0) / channels.reduce((s: number, c: any) => s + c.sent, 0)) * 100)}%</div></div>
         </div>
       </Card>
     </div>
@@ -1927,7 +1918,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
                   hover
                   onClick={() => setSelectedRecord(record)}
                   className={`p-4 ${selectedRecord?.id === record.id ? 'ring-2' : ''}`}
-                  style={selectedRecord?.id === record.id ? { '--tw-ring-color': theme.primary, borderColor: theme.light } : {}}
+                  style={selectedRecord?.id === record.id ? { '--tw-ring-color': theme.primary, borderColor: theme.light } as React.CSSProperties : {}}
                 >
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0" style={{ background: theme.light, color: theme.primary }}>
@@ -2121,7 +2112,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
         {/* Action Modal */}
         {showActionModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowActionModal(null)}>
-            <Card className="w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+            <Card className="w-full max-w-md p-6" onClick={(e?: React.MouseEvent) => e?.stopPropagation()}>
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 {showActionModal.action === 'call' && <><Phone className="w-5 h-5" /> {t.operations.callPatient}</>}
                 {showActionModal.action === 'message' && <><MessageSquare className="w-5 h-5" /> {t.operations.sendMessage}</>}
@@ -2172,6 +2163,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
     const [selectedWorkflowStep, setSelectedWorkflowStep] = useState(null);
     
     // Test/Playground state - integrated functionality
+    const textChatScrollRef = useRef<HTMLDivElement>(null);
     const [testMessages, setTestMessages] = useState<Array<{
       id: string;
       content: string;
@@ -2501,6 +2493,15 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
                     type: 'text' as const
                   };
                   setTestMessages(prev => [...prev, agentMessage]);
+                  // Auto-scroll to bottom when agent message arrives
+                  setTimeout(() => {
+                    if (textChatScrollRef.current) {
+                      textChatScrollRef.current.scrollTo({
+                        top: textChatScrollRef.current.scrollHeight,
+                        behavior: "smooth"
+                      });
+                    }
+                  }, 100);
                   break;
                 case 'agents_logs':
                   setExecutionLogs((agents: any) => [...agents, content.payload]);
@@ -2519,6 +2520,15 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
                   break;
                 case 'tool_calling':
                   setIsTyping(true);
+                  // Auto-scroll when typing indicator appears
+                  setTimeout(() => {
+                    if (textChatScrollRef.current) {
+                      textChatScrollRef.current.scrollTo({
+                        top: textChatScrollRef.current.scrollHeight,
+                        behavior: "smooth"
+                      });
+                    }
+                  }, 100);
                   break;
               }
             } catch (error) {
@@ -2585,6 +2595,15 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
       setTestMessages(prev => [...prev, userMessage]);
       setTestInput('');
       setIsTyping(true);
+      // Auto-scroll to bottom when user sends message
+      setTimeout(() => {
+        if (textChatScrollRef.current) {
+          textChatScrollRef.current.scrollTo({
+            top: textChatScrollRef.current.scrollHeight,
+            behavior: "smooth"
+          });
+        }
+      }, 100);
     };
 
     const clearSession = () => {
@@ -2644,7 +2663,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
         hover 
         onClick={() => { setSelectedAgent(agent); setIsEditingAgent(false); }}
         className={`p-5 ${selectedAgent?.id === agent.id ? 'ring-2' : ''}`}
-        style={selectedAgent?.id === agent.id ? { '--tw-ring-color': theme.primary } : {}}
+        style={selectedAgent?.id === agent.id ? { '--tw-ring-color': theme.primary } as React.CSSProperties : {}}
       >
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -2694,10 +2713,10 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <span className="text-xs text-gray-400">{t.studio.lastActivity}: {agent.lastActivity}</span>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedAgent(agent); setIsEditingAgent(true); }}>View / Edit</Button>
+            <Button variant="secondary" size="sm" onClick={() => { setSelectedAgent(agent); setIsEditingAgent(true); }}>View / Edit</Button>
             <Button 
               size="sm" 
-              onClick={(e) => { e.stopPropagation(); toggleAgentStatus(agent.id); }}
+              onClick={() => { toggleAgentStatus(agent.id); }}
               className={agent.status === 'active' ? '' : 'bg-emerald-500'}
             >
               {agent.status === 'active' ? (
@@ -2741,7 +2760,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
             </div>
           )}
 
-          <div className="p-5 space-y-6 max-h-[60vh] overflow-y-auto">
+          <div className="p-5 space-y-6 max-h-[70vh] overflow-y-auto">
             {/* Basic Configuration */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-4">{t.studio.basicConfiguration}</h4>
@@ -3384,7 +3403,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
                   </div>
                   
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto space-y-3 mb-4 min-h-0">
+                  <div ref={textChatScrollRef} className="flex-1 overflow-y-auto space-y-3 mb-4 min-h-0">
                     {testMessages.length === 0 ? (
                       <div className="h-full flex items-center justify-center text-gray-400 text-sm">
                         {t.studio.startConversationToSeeMessages}
@@ -3429,7 +3448,7 @@ const NA2Platform = ({ defaultView = 'dashboard' }: NA2PlatformProps) => {
                   </div>
                 </Card>
               ) : (
-                <Card className="p-0 flex flex-col overflow-hidden flex-shrink-0" style={{ height: 'calc(50vh - 120px)' }}>
+                <Card className="p-0 flex flex-col overflow-hidden flex-shrink-0" style={{ height: agentType === 'voice' ? 'calc(50vh - 60px)' : 'calc(50vh - 120px)' }}>
                   <div className="flex flex-col h-full min-h-0">
                     <ChatWithAttachments
                       duration={duration}

@@ -1,6 +1,5 @@
 import { LoginResponse } from '../types/auth';
-import { SERVER_URL, startTokenRefresh } from './base.api';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants/client-storage-keys';
+import { SERVER_URL } from './base.api';
 import { handleError } from '../utils/http-error';
 
 interface AuthBody {

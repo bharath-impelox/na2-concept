@@ -84,7 +84,7 @@ export const refreshTokenFn = async (serverUrl: string): Promise<string | null> 
 };
 
 // Start token refresh scheduler
-let refreshInterval: NodeJS.Timeout | null = null;
+let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
 export const startTokenRefresh = (serverUrl: string) => {
   // Clear any existing interval

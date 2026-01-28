@@ -24,7 +24,7 @@ const AudioRecorderIcon = ({
   duration,
   setDuration,
 }: AudioRecordProps) => {
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isRecording, setIsRecording] = useState(false);
 
   const startRecording = async () => {

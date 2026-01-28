@@ -190,7 +190,7 @@ const Login: React.FC = () => {
             type="submit"
             disabled={isLoading || isResendOtpLoading}
             className="w-full py-3 px-4 rounded-xl text-white font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' }}
+            style={{ background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' }}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">

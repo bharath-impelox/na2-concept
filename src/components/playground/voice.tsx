@@ -134,7 +134,7 @@ export function useRealtimeAudio({
       }
 
       const buffer = audioContextRef.current.createBuffer(1, chunk.length, audioContextRef.current.sampleRate);
-      buffer.copyToChannel(chunk, 0);
+      buffer.copyToChannel(new Float32Array(chunk), 0);
 
       const source = audioContextRef.current.createBufferSource();
       source.buffer = buffer;

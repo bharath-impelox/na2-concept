@@ -20,7 +20,7 @@ export default {
         },
       },
       backgroundImage: {
-        'primary-gradient': 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)',
+        'primary-gradient': 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)',
       },
     },
   },

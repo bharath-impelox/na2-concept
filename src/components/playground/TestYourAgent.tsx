@@ -663,7 +663,7 @@ const TestYourAgent: React.FC = () => {
                         className={`inline-flex cursor-pointer items-center gap-1 px-2 py-1 mx-1 flex-shrink-0
             ${selectedAgent == agentId ? 'text-white' : 'bg-blue-100 text-blue-800'}
             hover:text-white rounded-full text-xs transition-colors duration-150`}
-                      style={selectedAgent == agentId ? { background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}
+                      style={selectedAgent == agentId ? { background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}
                       >
                         <Bot width={'15px'} height={'15px'} />
                         {agent?.name}
@@ -698,7 +698,7 @@ const TestYourAgent: React.FC = () => {
                           ${t.isSelected ? 'text-white' : ''}
                          items-center px-2 py-1 rounded-full text-xs flex-shrink-0
                     `}
-                      style={t.isSelected ? { background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}>
+                      style={t.isSelected ? { background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' } : {}}>
                       {getToolIcon(t.type ?? "")}
                       {t.label}
                     </span>);
@@ -1090,7 +1090,7 @@ const TestYourAgent: React.FC = () => {
                   }}
                   disabled={!testPrompt.trim() || !selectedAgent || uploadError !== ""}
                   className="inline-flex mt-4 items-center cursor-pointer px-6 py-3 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1b44fe] disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ background: 'radial-gradient(88% 75%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' }}
+                  style={{ background: 'radial-gradient(ellipse 88% 75% at 50% 50%, rgb(27, 68, 254) 37.45%, rgb(83, 117, 254) 100%)' }}
                 >
                   {creatingSession ? <Loader2 className="animate-spin mx-2" /> : null}
                   {isRunning ? (
